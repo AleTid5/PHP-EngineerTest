@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Game;
 use Illuminate\Support\Facades\Input;
 
 class MatchController extends Controller {
@@ -24,22 +25,18 @@ class MatchController extends Controller {
     /**
      * Returns the state of a single match
      *
-     * TODO it's mocked, make this work :)
-     *
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function match($id) {
+        $game = new Game($id);
+        $board = $game->getBoard();
         return response()->json([
             'id' => $id,
-            'name' => 'Match'.$id,
-            'next' => 2,
-            'winner' => 0,
-            'board' => [
-                1, 0, 2,
-                0, 1, 2,
-                0, 0, 0,
-            ],
+            'name' => 'Match' . $id,
+            'next' => $board['next'],
+            'winner' => $board['winner'],
+            'board' => $board['board'],
         ]);
     }
 
@@ -52,14 +49,11 @@ class MatchController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function move($id) {
-        $board = [
-            1, 0, 2,
-            0, 1, 2,
-            0, 0, 0,
-        ];
+        $game = new Game($id);
+        $board = $game->getBoard();
 
         $position = Input::get('position');
-        $board[$position] = 2;
+        $board[$position] = $board['next'];
 
         return response()->json([
             'id' => $id,
