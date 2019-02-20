@@ -19,6 +19,8 @@ class Game
     }
 
     /**
+     * Inicializa el tablero y el jugador que juega primero.
+     *
      * @param int|null $player
      */
     public function initializeBoard(?int $player = null)
@@ -48,6 +50,8 @@ class Game
     }
 
     /**
+     * Devuelve el tablero seleccionado.
+     *
      * @return array|mixed
      */
     public function getBoard()
@@ -56,6 +60,8 @@ class Game
     }
 
     /**
+     * Establece el tablero en sesión.
+     *
      * @param array|mixed $board
      */
     public function setBoard($board): void
@@ -63,6 +69,9 @@ class Game
         Session::put('board_' . $this->id, $board);
     }
 
+    /**
+     * Crea un juego y establece un ID basado en el último creado.
+     */
     public function createMatch()
     {
         $games = $this->getAllGames();
@@ -70,11 +79,19 @@ class Game
         $this->initializeBoard();
     }
 
+    /**
+     * Elimina un juego seleccionado.
+     */
     public function removeMatch()
     {
         Session::remove('board_' . $this->id);
     }
 
+    /**
+     * Devuelve todos los juegos que hay en sesión.
+     *
+     * @return array
+     */
     public function getAllGames()
     {
         $mixedGames = Session::all();
@@ -90,6 +107,8 @@ class Game
     }
 
     /**
+     * Realiza una jugada en el tablero.
+     *
      * @param $player
      * @param $position
      */
@@ -103,6 +122,8 @@ class Game
     }
 
     /**
+     * Valida si el jugador que realizó el movimiento es ganador.
+     *
      * @param $player
      * @param $position
      * @return int
@@ -137,6 +158,8 @@ class Game
     }
 
     /**
+     * Devuelve las lineas ganadoras.
+     *
      * @return array
      */
     private function getWinnerLines()
