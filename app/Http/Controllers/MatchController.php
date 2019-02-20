@@ -15,12 +15,10 @@ class MatchController extends Controller {
     /**
      * Returns a list of matches
      *
-     * TODO it's mocked, make this work :)
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function matches() {
-        return response()->json($this->fakeMatches());
+        return response()->json($this->getMatches());
     }
 
     /**
@@ -48,8 +46,6 @@ class MatchController extends Controller {
     /**
      * Makes a move in a match
      *
-     * TODO it's mocked, make this work :)
-     *
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
@@ -73,36 +69,34 @@ class MatchController extends Controller {
     /**
      * Creates a new match and returns the new list of matches
      *
-     * TODO it's mocked, make this work :)
-     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function create() {
         $game = new Game();
-        $game->getAllGames();
-        return response()->json($this->fakeMatches());
+        $game->createMatch();
+
+        return response()->json($this->getMatches());
     }
 
     /**
      * Deletes the match and returns the new list of matches
      *
-     * TODO it's mocked, make this work :)
-     *
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function delete($id) {
-        return response()->json($this->fakeMatches()->filter(function($match) use($id){
-            return $match['id'] != $id;
-        })->values());
+        $game = new Game($id);
+        $game->removeMatch();
+
+        return response()->json($this->getMatches());
     }
 
     /**
-     * Creates a fake array of matches
+     * Return matches
      *
      * @return \Illuminate\Support\Collection
      */
-    private function fakeMatches() {
+    private function getMatches() {
 
         return collect((new Game())->getAllGames());
     }

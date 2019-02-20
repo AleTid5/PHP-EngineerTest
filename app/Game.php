@@ -19,9 +19,9 @@ class Game
     }
 
     /**
-     * @param $player
+     * @param int|null $player
      */
-    public function initializeBoard($player)
+    public function initializeBoard(?int $player = null)
     {
         $board = $this->getBoard();
 
@@ -41,7 +41,7 @@ class Game
 
         $board = $this->getBoard();
 
-        if ($player !== null) {
+        if ($player !== null && (int) $board['next'] === 0) {
             $board['next'] = $player;
             $this->setBoard($board);
         }
@@ -61,6 +61,18 @@ class Game
     public function setBoard($board): void
     {
         Session::put('board_' . $this->id, $board);
+    }
+
+    public function createMatch()
+    {
+        $games = $this->getAllGames();
+        $this->id = isset($games[count($games) - 1]) ? $games[count($games) - 1]['id'] + 1 : 1;
+        $this->initializeBoard();
+    }
+
+    public function removeMatch()
+    {
+        Session::remove('board_' . $this->id);
     }
 
     public function getAllGames()
@@ -85,6 +97,7 @@ class Game
     {
         $board = $this->getBoard();
         $board['board'][$position] = $player;
+        $board['next'] = $player === 1 ? 2 : 1;
         $board['winner'] = $this->checkWinner($player, $position);
         $this->setBoard($board);
     }

@@ -49688,6 +49688,10 @@ var RELOAD_TIME = 3000;
             return value === 1 ? 'X' : value === 2 ? 'O' : '';
         },
         move: function move(position) {
+            if (this.match.winner !== 0) {
+                return;
+            }
+
             if (this.match.next !== this.currentPlayer) {
                 alert('Not your turn!');
                 return;
