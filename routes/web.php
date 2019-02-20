@@ -15,7 +15,7 @@ Route::view('/', 'index');
 
 Route::prefix('api')->group(function () {
     Route::get('match', 'MatchController@matches')->name('matches');
-    Route::get('match/{id}', 'MatchController@match')->name('match');
+    Route::post('match/{id}', 'MatchController@match')->name('match');
     Route::put('match/{id}', 'MatchController@move')->name('move');
     Route::post('match', 'MatchController@create')->name('create_match');
     Route::delete('match/{id}', 'MatchController@delete')->name('delete_match');

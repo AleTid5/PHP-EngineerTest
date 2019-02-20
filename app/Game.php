@@ -9,21 +9,27 @@ class Game
 {
     private $id = null;
 
-    public function __construct($id)
+    /**
+     * Game constructor.
+     * @param int|null $id
+     */
+    public function __construct(?int $id = null)
     {
         $this->id = $id;
-        $this->initializeBoard();
     }
 
-    public function initializeBoard()
+    /**
+     * @param $player
+     */
+    public function initializeBoard($player)
     {
         $board = $this->getBoard();
 
         if ($board === null) {
             $this->setBoard([
-                'id' => $this->id,
+                'id' => (int) $this->id,
                 'name' => 'Match' . $this->id,
-                'next' => '1',
+                'next' => $player,
                 'winner' => 0,
                 'board' => [
                     0, 0, 0,
@@ -31,6 +37,13 @@ class Game
                     0, 0, 0,
                 ]
             ]);
+        }
+
+        $board = $this->getBoard();
+
+        if ($player !== null) {
+            $board['next'] = $player;
+            $this->setBoard($board);
         }
     }
 
@@ -50,6 +63,24 @@ class Game
         Session::put('board_' . $this->id, $board);
     }
 
+    public function getAllGames()
+    {
+        $mixedGames = Session::all();
+        $games = [];
+
+        foreach ($mixedGames as $sessionName => $game) {
+            if (stripos($sessionName, 'board_') !== false) {
+              $games[] = $game;
+            }
+        }
+
+        return $games;
+    }
+
+    /**
+     * @param $player
+     * @param $position
+     */
     public function changeBoard($player, $position)
     {
         $board = $this->getBoard();
@@ -58,6 +89,11 @@ class Game
         $this->setBoard($board);
     }
 
+    /**
+     * @param $player
+     * @param $position
+     * @return int
+     */
     private function checkWinner($player, $position)
     {
         $board = $this->getBoard();
@@ -87,6 +123,9 @@ class Game
         return 0;
     }
 
+    /**
+     * @return array
+     */
     private function getWinnerLines()
     {
         return [

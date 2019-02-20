@@ -6,7 +6,10 @@
         </h3></div>
 
         <div class="card-body text-center">
-            <p v-if="ended" class="card-text">The winner is: {{ winner()}}</p>
+            <p v-if="ended" class="card-text">
+                <span v-if="winner() > 0">El ganador es {{ player(winner()) }}</span>
+                <span v-else>No hay ganador. Terminó en empate!</span>
+            </p>
             <p v-else class="card-text">Next: {{ next()}}</p>
 
 
@@ -68,7 +71,7 @@
                 return this.player(this.match.next);
             },
             winner() {
-                return this.player(this.match.winner);
+                return this.match.winner;
             },
             player(value) {
                 return value === 1 ? 'X' : (value === 2 ? 'O' : '');
@@ -79,15 +82,21 @@
                     return;
                 }
                 this.$emit('move', {
+                    id: this.match.id,
                     position: position,
-                    id: this.match.id
+                    player: this.currentPlayer
                 })
+
+                this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
             },
             load() {
-                if (!this.loading) {
-                    this.$emit('load');
+                if (! this.loading) {
+                    this.$emit('load', {
+                        id: this.match.id,
+                        player: this.currentPlayer
+                    });
                 }
-                if(!this.ended){
+                if (! this.ended){
                     this.timeout = setTimeout(this.load, RELOAD_TIME);
                 }
             },

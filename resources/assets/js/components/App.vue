@@ -8,7 +8,7 @@
                 </template>
                 <template v-if="inMatch">
                     <match :match="match" :loading="loading"
-                           @load="loadMatch(match.id)"
+                           @load="loadMatch"
                            @move="handleMove"
                            @showMatches="showMatches"/>
                 </template>
@@ -55,11 +55,11 @@
                     this.current = MATCH;
                 });
             },
-            loadMatch(id) {
+            loadMatch(data) {
                 let that = this;
                 that.loading = true;
                 // Load match
-                api.match({id: id}).then(({data}) => {
+                api.match(data).then(({data}) => {
                     this.match = data;
                     that.loading = false;
                 });

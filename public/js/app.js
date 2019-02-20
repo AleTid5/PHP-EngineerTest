@@ -48844,13 +48844,13 @@ var MATCHES = 'matches',
                 _this.current = MATCH;
             });
         },
-        loadMatch: function loadMatch(id) {
+        loadMatch: function loadMatch(data) {
             var _this2 = this;
 
             var that = this;
             that.loading = true;
             // Load match
-            __WEBPACK_IMPORTED_MODULE_0__api__["a" /* default */].match({ id: id }).then(function (_ref2) {
+            __WEBPACK_IMPORTED_MODULE_0__api__["a" /* default */].match(data).then(function (_ref2) {
                 var data = _ref2.data;
 
                 _this2.match = data;
@@ -48933,16 +48933,21 @@ var URL_MATCHES = '/api/match',
         return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(URL_MATCHES);
     },
     match: function match(_ref) {
-        var id = _ref.id;
+        var id = _ref.id,
+            player = _ref.player;
 
-        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(URL_MATCH + id);
+        return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.post(URL_MATCH + id, {
+            player: player
+        });
     },
     move: function move(_ref2) {
         var id = _ref2.id,
-            position = _ref2.position;
+            position = _ref2.position,
+            player = _ref2.player;
 
         return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.put(URL_MOVE + id, {
-            position: position
+            position: position,
+            player: player
         });
     },
     create: function create() {
@@ -49647,6 +49652,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 var RELOAD_TIME = 3000;
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -49674,7 +49682,7 @@ var RELOAD_TIME = 3000;
             return this.player(this.match.next);
         },
         winner: function winner() {
-            return this.player(this.match.winner);
+            return this.match.winner;
         },
         player: function player(value) {
             return value === 1 ? 'X' : value === 2 ? 'O' : '';
@@ -49685,13 +49693,19 @@ var RELOAD_TIME = 3000;
                 return;
             }
             this.$emit('move', {
+                id: this.match.id,
                 position: position,
-                id: this.match.id
+                player: this.currentPlayer
             });
+
+            this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
         },
         load: function load() {
             if (!this.loading) {
-                this.$emit('load');
+                this.$emit('load', {
+                    id: this.match.id,
+                    player: this.currentPlayer
+                });
             }
             if (!this.ended) {
                 this.timeout = setTimeout(this.load, RELOAD_TIME);
@@ -49726,7 +49740,11 @@ var render = function() {
     _c("div", { staticClass: "card-body text-center" }, [
       _vm.ended
         ? _c("p", { staticClass: "card-text" }, [
-            _vm._v("The winner is: " + _vm._s(_vm.winner()))
+            _vm.winner() > 0
+              ? _c("span", [
+                  _vm._v("El ganador es " + _vm._s(_vm.player(_vm.winner())))
+                ])
+              : _c("span", [_vm._v("No hay ganador. Terminó en empate!")])
           ])
         : _c("p", { staticClass: "card-text" }, [
             _vm._v("Next: " + _vm._s(_vm.next()))
@@ -49946,9 +49964,7 @@ var render = function() {
                 _c("match", {
                   attrs: { match: _vm.match, loading: _vm.loading },
                   on: {
-                    load: function($event) {
-                      return _vm.loadMatch(_vm.match.id)
-                    },
+                    load: _vm.loadMatch,
                     move: _vm.handleMove,
                     showMatches: _vm.showMatches
                   }

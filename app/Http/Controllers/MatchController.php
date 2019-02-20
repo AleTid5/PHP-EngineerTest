@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Game;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
 class MatchController extends Controller {
@@ -26,15 +27,19 @@ class MatchController extends Controller {
      * Returns the state of a single match
      *
      * @param $id
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function match($id) {
+    public function match($id, Request $request) {
+        $player = $request->request->get('player');
         $game = new Game($id);
+        $game->initializeBoard($player);
         $board = $game->getBoard();
+
         return response()->json([
             'id' => $id,
             'name' => 'Match' . $id,
-            'next' => $board['next'],
+            'next' => (int) $board['next'],
             'winner' => $board['winner'],
             'board' => $board['board'],
         ]);
@@ -49,18 +54,19 @@ class MatchController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function move($id) {
-        $game = new Game($id);
-        $board = $game->getBoard();
-
         $position = Input::get('position');
-        $board[$position] = $board['next'];
+        $player = Input::get('player');
+
+        $game = new Game($id);
+        $game->changeBoard($player, $position);
+        $board = $game->getBoard();
 
         return response()->json([
             'id' => $id,
-            'name' => 'Match'.$id,
-            'next' => 1,
-            'winner' => 0,
-            'board' => $board,
+            'name' => 'Match' . $id,
+            'next' => $board['next'],
+            'winner' => $board['winner'],
+            'board' => $board['board'],
         ]);
     }
 
@@ -72,6 +78,8 @@ class MatchController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function create() {
+        $game = new Game();
+        $game->getAllGames();
         return response()->json($this->fakeMatches());
     }
 
@@ -95,52 +103,8 @@ class MatchController extends Controller {
      * @return \Illuminate\Support\Collection
      */
     private function fakeMatches() {
-        return collect([
-            [
-                'id' => 1,
-                'name' => 'Match1',
-                'next' => 2,
-                'winner' => 1,
-                'board' => [
-                    1, 0, 2,
-                    0, 1, 2,
-                    0, 2, 1,
-                ],
-            ],
-            [
-                'id' => 2,
-                'name' => 'Match2',
-                'next' => 1,
-                'winner' => 0,
-                'board' => [
-                    1, 0, 2,
-                    0, 1, 2,
-                    0, 0, 0,
-                ],
-            ],
-            [
-                'id' => 3,
-                'name' => 'Match3',
-                'next' => 1,
-                'winner' => 0,
-                'board' => [
-                    1, 0, 2,
-                    0, 1, 2,
-                    0, 2, 0,
-                ],
-            ],
-            [
-                'id' => 4,
-                'name' => 'Match4',
-                'next' => 2,
-                'winner' => 0,
-                'board' => [
-                    0, 0, 0,
-                    0, 0, 0,
-                    0, 0, 0,
-                ],
-            ],
-        ]);
+
+        return collect((new Game())->getAllGames());
     }
 
 }

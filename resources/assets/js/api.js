@@ -10,12 +10,15 @@ export default {
     matches: () => {
         return axios.get(URL_MATCHES)
     },
-    match: ({id}) => {
-        return axios.get(URL_MATCH + id)
+    match: ({id, player}) => {
+        return axios.post(URL_MATCH + id, {
+            player: player
+        })
     },
-    move: ({id, position}) => {
+    move: ({id, position, player}) => {
         return axios.put(URL_MOVE + id, {
-            position: position
+            position: position,
+            player: player,
         })
     },
     create: () => {
