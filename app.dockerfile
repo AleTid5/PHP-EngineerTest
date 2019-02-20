@@ -1,5 +1,8 @@
 FROM php:7.1-fpm
 
+RUN apt-get update
+RUN apt-get install curl gnupg -yq
+
 RUN apt-get update && apt-get install -y libmcrypt-dev \
     mysql-client libmagickwand-dev --no-install-recommends \
     && pecl install imagick \
