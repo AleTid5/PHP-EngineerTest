@@ -49688,7 +49688,7 @@ var RELOAD_TIME = 3000;
             return value === 1 ? 'X' : value === 2 ? 'O' : '';
         },
         move: function move(position) {
-            if (this.match.winner !== 0) {
+            if (this.match.winner !== 0 || this.field(position) !== '') {
                 return;
             }
 
@@ -49696,6 +49696,7 @@ var RELOAD_TIME = 3000;
                 alert('Not your turn!');
                 return;
             }
+
             this.$emit('move', {
                 id: this.match.id,
                 position: position,

@@ -30,16 +30,22 @@ class MatchController extends Controller {
      */
     public function match($id, Request $request) {
         $player = $request->request->get('player');
-        $game = new Game($id);
+        $game = new Game(['id' => $id]);
         $game->initializeBoard($player);
-        $board = $game->getBoard();
+        $board = Game::query()->where('id', $id)->first();
+
+        if ($board === null) {
+            return response()->json([]);
+        }
+
+        $board = $board->toArray();
 
         return response()->json([
             'id' => $id,
             'name' => 'Match' . $id,
             'next' => (int) $board['next'],
             'winner' => $board['winner'],
-            'board' => $board['board'],
+            'board' => json_decode($board['board'], false)
         ]);
     }
 
@@ -53,16 +59,16 @@ class MatchController extends Controller {
         $position = Input::get('position');
         $player = Input::get('player');
 
-        $game = new Game($id);
+        $game = new Game(['id' => $id]);
         $game->changeBoard($player, $position);
-        $board = $game->getBoard();
+        $board = Game::query()->where('id', $id)->first()->toArray();
 
         return response()->json([
             'id' => $id,
             'name' => 'Match' . $id,
             'next' => $board['next'],
             'winner' => $board['winner'],
-            'board' => $board['board'],
+            'board' => json_decode($board['board'], false)
         ]);
     }
 
@@ -73,7 +79,7 @@ class MatchController extends Controller {
      */
     public function create() {
         $game = new Game();
-        $game->createMatch();
+        $game->initializeBoard();
 
         return response()->json($this->getMatches());
     }
@@ -85,8 +91,7 @@ class MatchController extends Controller {
      * @return \Illuminate\Http\JsonResponse
      */
     public function delete($id) {
-        $game = new Game($id);
-        $game->removeMatch();
+        (new Game())::query()->find($id)->delete();
 
         return response()->json($this->getMatches());
     }
@@ -96,9 +101,15 @@ class MatchController extends Controller {
      *
      * @return \Illuminate\Support\Collection
      */
-    private function getMatches() {
+    private function getMatches()
+    {
+        $games = Game::all()->toArray();
 
-        return collect((new Game())->getAllGames());
+        foreach ($games as &$game) {
+            $game['board'] = json_decode($game['board'], false);
+        }
+
+        return collect($games);
     }
 
 }
