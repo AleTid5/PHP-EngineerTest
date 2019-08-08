@@ -1,4 +1,7 @@
 # PHP Full Stack Engineer project
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/AleTid5/PHP-EngineerTest.svg)](https://greenkeeper.io/)
+
 ___
 
 ## The challenge
